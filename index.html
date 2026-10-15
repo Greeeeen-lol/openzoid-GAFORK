@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
 
+    <script>
+        // Phones get the touch editor (mobile.html). Add ?desktop to the URL
+        // to stay on this layout anyway; tablets keep it by default.
+        (function () {
+            var q = location.search;
+            var phone = window.matchMedia && matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
+            if (phone && !/[?&]desktop(=|&|$)/.test(q)) location.replace("mobile.html" + q + location.hash);
+        })();
+    </script>
+
     <link rel="stylesheet" href="./pz.all-35.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Code+Pro">
 
