@@ -427,7 +427,7 @@ PZ.agent = PZ.agent || {};
         if (typeof value === "string") {
             if (type === T.LIST) return optionValue(prop, value);
             if (type === T.TEXT || type === T.SHADER) return value;
-            if (type === T.ASSET) return fontShortcut(value);
+            if (type === T.ASSET) return presetAsset(prop, value);
             if (type === T.COLOR && /^#?[0-9a-f]{6}$/i.test(value.trim())) return hexToRgb(value.trim());
             try {
                 let parsed = JSON.parse(value);
@@ -461,6 +461,19 @@ PZ.agent = PZ.agent || {};
         return [0, 2, 4].map((i) => parseInt(hex.substr(i, 2), 16) / 255);
     }
 
+    // Preset images (particle textures: "star1", "ring"...) must be registered
+    // with the project before the property can point at them, the same way the
+    // texture dropdown does it; the property then holds the asset key.
+    function presetAsset(prop, value) {
+        let def = prop.definition || {};
+        let name = value.trim().replace(/\.png$/i, "");
+        let project = prop.parentProject;
+        if (Array.isArray(def.items) && def.baseUrl && def.items.indexOf(name) !== -1 && project) {
+            return project.assets.createFromPreset(def.assetType || PZ.asset.type.IMAGE, def.baseUrl + name + ".png").key;
+        }
+        return fontShortcut(value);
+    }
+
     // Fonts can be named rather than given as a path: "lobster" -> the bundled file.
     function fontShortcut(value) {
         let presets = (PZ.asset && PZ.asset.font && PZ.asset.font.preset) || [];
@@ -489,7 +502,7 @@ PZ.agent = PZ.agent || {};
             let list = PZ.tween.easingList;
             let wanted = String(kf.easing).toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
             // Allow "in-out" / "inout" / "ease out cubic" style spellings.
-            let norm = (s) => s.replace(/\s+/g, "").replace("inout", "in out");
+            let norm = (s) => s.replace(/[\s\-_]+/g, "");
             let idx = list.findIndex((e) => e.name === wanted);
             if (idx === -1) idx = list.findIndex((e) => norm(e.name) === norm(wanted));
             if (idx === -1 && /^\d+$/.test(wanted)) idx = +wanted;
@@ -647,7 +660,7 @@ PZ.agent = PZ.agent || {};
                 return { fonts: (PZ.asset && PZ.asset.font && PZ.asset.font.preset) || [], note: "Set a text layer's font property to one of these names." };
             }
             if (category === "easings") {
-                return { easings: PZ.tween.easingList.map((e) => e.name), note: "Pass as keyframe easing. 'none' holds the value until the next keyframe." };
+                return { easings: PZ.tween.easingList.map((e) => e.name), note: "Pass as keyframe easing. A keyframe's easing shapes the motion into it from the previous keyframe. 'none' holds the previous value, then jumps at that keyframe." };
             }
             let base = CATALOG_BASES[category];
             if (!base) throw new Error("Unknown category '" + args.category + "'. Choose one of: layers, effects, objects3d, materials, shapes, operations, fonts, easings.");
@@ -1026,7 +1039,7 @@ PZ.agent = PZ.agent || {};
             easing: {
                 type: "string",
                 description:
-                    "Easing out of this keyframe toward the next, by name: e.g. \"linear\", \"cubic out\", \"quintic in-out\", \"back out\", \"elastic out\", \"bounce out\", or \"none\" to hold. See list_catalog easings.",
+                    "Easing of the motion INTO this keyframe from the previous one, by name: e.g. \"linear\", \"cubic out\", \"quintic in-out\", \"back out\", \"elastic out\", \"bounce out\", or \"none\" to hold the previous value and jump at this frame. The first keyframe's easing has no effect. See list_catalog easings.",
             },
         },
         required: ["frame", "value"],
@@ -1221,7 +1234,7 @@ PZ.agent = PZ.agent || {};
             {
                 name: "animate_property",
                 description:
-                    "Replace a property's animation with the given keyframes, turning animation on if it is off. Works on layers and on children (node), e.g. an effect's strength or a 3D object's rotation. Frames are relative to the clip start, not the sequence. Any keyframes the property already had at other frames are removed, so pass the complete animation. Use easings for polished motion: \"cubic out\" or \"quintic out\" for entrances, \"cubic in\" for exits, \"back out\" for a slight overshoot, \"elastic out\" or \"bounce out\" for playful motion.",
+                    "Replace a property's animation with the given keyframes, turning animation on if it is off. Works on layers and on children (node), e.g. an effect's strength or a 3D object's rotation. Frames are relative to the clip start, not the sequence. Any keyframes the property already had at other frames are removed, so pass the complete animation. A keyframe's easing applies to the motion arriving at it, so put it on the later keyframe: [{frame: 0, value: 0}, {frame: 20, value: 1, easing: \"back out\"}] overshoots into frame 20. Use easings for polished motion: \"cubic out\" or \"quintic out\" for entrances, \"cubic in\" for exits, \"back out\" for a slight overshoot, \"elastic out\" or \"bounce out\" for playful motion.",
                 input_schema: {
                     type: "object",
                     properties: {
@@ -1399,6 +1412,7 @@ PZ.agent = PZ.agent || {};
         "- Layer position is in pixels with the origin at the centre of the frame, x to the right and y upward. At 1920x1080 the top-left corner is [-960, 540].",
         "- Rotation is in radians. Opacity runs 0 to 1. Colours are [r, g, b] arrays in 0 to 1 (a \"#rrggbb\" string also works).",
         "- Keyframe frames on a layer's properties are relative to that clip's start, not to the sequence timeline. A clip starting at frame 60 animates from its own frame 0.",
+        "- A keyframe's easing shapes the motion arriving at it from the previous keyframe, so put \"elastic out\" or \"back out\" on the later keyframe of an entrance. Easing on the first keyframe does nothing.",
         "- A new scene layer shows nothing until it has objects and light: add shapes with a material colour, and at least one light (an ambient light plus a directional or point light reads well). The camera looks down -z, so place objects at negative z.",
         "- Layer and clip ids shift when clips are added, moved or deleted. Re-read get_project rather than reusing old ids.",
         "",

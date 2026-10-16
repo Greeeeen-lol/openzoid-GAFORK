@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "openzoid": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "E:/openzoid-GAFORK-main/mcp/server.js"
+      ],
+      "env": {}
+    }
+  }
+}
