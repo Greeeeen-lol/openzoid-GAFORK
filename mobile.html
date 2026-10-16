@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1d1d1d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="openzoid">
+    <title>openzoid mobile</title>
+
+    <link rel="manifest" href="./mobile/manifest.webmanifest">
+    <link rel="icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" href="./mobile/icon-192.png">
+
+    <link rel="stylesheet" href="./pz.all-35.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Code+Pro|Source+Sans+Pro:400,600,700">
+    <link rel="stylesheet" href="./mobile/mobile.css" />
+
+    <script src="./three.r91.min.js"></script>
+
+    <script>
+        var PZ = {};
+
+        PZ.stringHash = function (str) {
+            var hash = 0;
+            var chr;
+            if (str.length === 0) return hash;
+            for (var i = 0; i < str.length; i++) {
+                chr = str.charCodeAt(i);
+                hash = (hash << 5) - hash + chr;
+                hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
+        };
+
+        PZ.apiOrigin = "";
+        PZ.blobOrigin = "";
+
+        PZ.account = {
+            updatePromise: null,
+        };
+
+        PZ.account.getCurrent = async function () { return null; };
+
+        PZ.api = async function (url, op, body) {};
+
+        PZ.ui = PZ.ui || {};
+        PZ.ui.ads = {};
+
+        PZ.ui.ads.init = async function () {};
+
+        PZ.ui.ads.show = async function (unit, elementID) {};
+    </script>
+</head>
+
+<body>
+    <script src="./core-1.0.102.js"></script>
+    <script src="./ui-1.0.72.js"></script>
+
+    <!-- Optional: the AI assistant. The editor works without it. -->
+    <script src="./agent.js"></script>
+
+    <script src="./mobile/mobile.js"></script>
+
+    <script>
+        PZM.start();
+    </script>
+</body>
+
+</html>

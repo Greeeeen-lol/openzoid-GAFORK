@@ -34,6 +34,22 @@ https://panzoid.com/community/search/85948?q=user%3ARedTubePoop
 
 https://panzoid.com/community/18345
 
+## Mobile editor
+
+`mobile.html` is a touch editor for phones, built on the same Clipmaker 3 engine. Phones that open `index.html` or `clipmaker.html` are sent there automatically. Add `?desktop` to the URL to keep the desktop layout. Tablets keep the desktop layout by default.
+
+The layout follows phone video editors: the preview on top, a timeline with a fixed centre playhead underneath, a tool strip along the bottom, and panels that slide up over the timeline while the preview stays visible. Everything is in Panzoid's colours and icons.
+
+- **Timeline.** Scroll it sideways to scrub, pinch to zoom. Tap a clip to select it, drag the white handles to trim, and long-press then drag to move it in time or onto another layer. Clips snap to the playhead and to each other's edges. An imported video's sound moves, trims, splits and deletes with it.
+- **Preview.** With a clip selected, drag on the preview to move it, pinch to scale and twist to rotate. Tap to play or pause.
+- **Tools.** Import (video, photos, audio, `.pz`), Library, Text, Shapes, Effects (adds an adjustment layer carrying the effect), 3D, Audio, Composite, Canvas (aspect ratio and frame rate) and AI. A selected clip gets Edit, Split, Speed, Volume, Effects, Opacity, Keyframe, Duplicate and Delete.
+- **Keyframes.** The ◆ button adds or removes a keyframe for position, scale, rotation and opacity at the playhead. Move the playhead, drag the layer, and it animates.
+- **Full editing.** Edit, Effects, Objects, Export and AI embed the desktop panels as they are, so every property, effect and export option is still reachable.
+
+Imported videos and photos are scaled to fit the canvas, the way phone editors do. Panzoid itself places them at their pixel size.
+
+Edits go through the same undoable commands as the desktop timeline, so projects open in either editor and undo behaves the same. On a phone you can also "Add to Home Screen" to run it full screen like an app. `tests/mobile_ui.test.js` drives the whole thing in an emulated phone when Playwright is installed.
+
 ## AI agent
 
 openzoid ships with an optional AI agent that builds and edits the project for you. Open the lightbulb tab in the sidebar, paste an API key, and describe what you want — "make a spinning intro that says my name", "add a glow to the title", "slow the whole thing down".
